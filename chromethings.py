@@ -24,14 +24,14 @@ def setup_selenium(link):
 def username(driver, username):
     elem = driver.find_element(By.CSS_SELECTOR, ".nickname")
     elem.clear()
-    elem.send_keys(username)
+    elem.send_keys(input("username: "))
     elem.send_keys(Keys.RETURN)
 
 
 def switch_to_iframe(driver):
     # Find the iframe using its src attribute
     iframe = driver.find_element(
-        By.XPATH, '//iframe[@src="https://phoenix.jklm.fun/games/bombparty"]'
+        By.XPATH, '//iframe[@src="https://falcon.jklm.fun/games/bombparty"]'
     )
 
     # Switch to the iframe
@@ -51,10 +51,9 @@ def scan_for_syllable(driver):
     return element.text.upper()
 
 
-def is_turn_update(driver, time_delay=0):
+def get_player_turn(driver):
     element = driver.find_element(By.CSS_SELECTOR, ".player")
-    time.sleep(time_delay)
-    return element.text == ""
+    return element.text
 
 
 def get_word(syllable, words):
@@ -82,11 +81,9 @@ def input_word(driver, word):
         elem.send_keys(Keys.RETURN)
     except ElementNotInteractableException:
         print("Element was not interactable at this time.")
-        print(1)
         pass
     except InvalidElementStateException:
         print("Element was in an invalid state.")
-        print(2)
         pass
 
 
@@ -94,8 +91,8 @@ def __main__():
     game_is_active, is_your_turn = False, False
     with open("dict.txt") as f:
         list = [line[:-1] for line in f]
-    driver = setup_selenium("https://jklm.fun/NRTP")
-    username(driver, "beep")  # username is currently "beep"
+    driver = setup_selenium("https://jklm.fun/WCXC")
+    username(driver, "beep's rival")  # username is currently "beep"
     time.sleep(3)  # need to wait for things to load, can probably lower time
     switch_to_iframe(driver)  # jklm uses an iframe to host its gameplay
     join_game(driver, 2)  # join the game
@@ -107,12 +104,12 @@ def __main__():
     game_is_active = True
 
     while game_is_active:
-        is_your_turn = is_turn_update(driver)
-        time.sleep(5 / 2)  # update every half of the 5 mandatory seconds per turn
+        is_your_turn = get_player_turn(driver) == ""
         while is_your_turn:
-            time.sleep(0.05)
             word = get_word(scan_for_syllable(driver), list)
             input_word(driver, word)
+            time.sleep(0.05)
+            is_your_turn = get_player_turn(driver) == ""
 
 
 __main__()
