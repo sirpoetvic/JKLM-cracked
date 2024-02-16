@@ -21,7 +21,7 @@ def setup_selenium(link):
     return driver
 
 
-def username(driver, username):
+def username(driver):
     elem = driver.find_element(By.CSS_SELECTOR, ".nickname")
     elem.clear()
     elem.send_keys(input("username: "))
@@ -30,9 +30,7 @@ def username(driver, username):
 
 def switch_to_iframe(driver):
     # Find the iframe using its src attribute
-    iframe = driver.find_element(
-        By.XPATH, '//iframe[@src="https://falcon.jklm.fun/games/bombparty"]'
-    )
+    iframe = driver.find_element(By.TAG_NAME, "iframe")
 
     # Switch to the iframe
     driver.switch_to.frame(iframe)
@@ -91,8 +89,8 @@ def __main__():
     game_is_active, is_your_turn = False, False
     with open("dict.txt") as f:
         list = [line[:-1] for line in f]
-    driver = setup_selenium("https://jklm.fun/WCXC")
-    username(driver, "beep's rival")  # username is currently "beep"
+    driver = setup_selenium(f"https://jklm.fun/{(input('room code id: '))}")
+    username(driver)  # username is currently "beep"
     time.sleep(3)  # need to wait for things to load, can probably lower time
     switch_to_iframe(driver)  # jklm uses an iframe to host its gameplay
     join_game(driver, 2)  # join the game
