@@ -1,4 +1,5 @@
 import time
+import random
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -8,7 +9,7 @@ from selenium.common.exceptions import ElementNotInteractableException
 from selenium.common.exceptions import InvalidElementStateException
 
 used_words = dict()
-
+rare_letters = ["q", "k", "j", "x", "w", "y", "z"]
 
 def setup_selenium(link):
     options = webdriver.ChromeOptions()
@@ -69,6 +70,22 @@ def get_word(syllable, words):
     return longest
 
 
+def get_word_with_rare(syllable, words, num):
+    longest = ""
+    for word in words:
+        if (
+            syllable in word
+            and len(word) > len(longest)
+            and word not in used_words.keys()
+            and rare_letters[num]
+        ):
+            longest = word
+            time.sleep(0.05)
+            used_words[word] = 1
+
+    return longest
+
+
 def input_word(driver, word):
     try:
         elem = driver.find_element(
@@ -78,7 +95,6 @@ def input_word(driver, word):
         elem.send_keys(word)
         elem.send_keys(Keys.RETURN)
     except ElementNotInteractableException:
-        print("Element was not interactable at this time.")
         pass
     except InvalidElementStateException:
         print("Element was in an invalid state.")
@@ -101,13 +117,23 @@ def __main__():
     # to see if .syllable is the CSS element we are looking for
     game_is_active = True
 
+    rare = 0
+    rarity = 0
+
     while game_is_active:
         is_your_turn = get_player_turn(driver) == ""
+        print(f"next rare letter: {rare_letters[rare]}")
         while is_your_turn:
-            word = get_word(scan_for_syllable(driver), list)
+            if rarity % 3 == 0:
+                word = get_word_with_rare(scan_for_syllable(driver), list, rare)
+                rare += 1
+                rare %= len(rare_letters)
+            else:
+                word = get_word(scan_for_syllable(driver), list)
             input_word(driver, word)
             time.sleep(0.05)
-            is_your_turn = get_player_turn(driver) == ""
+            is_your_turn = False
+            rarity = rarity + 1
 
 
 __main__()
