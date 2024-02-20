@@ -117,7 +117,7 @@ def get_player_turn(driver: webdriver) -> str:
     return element.text
 
 
-def is_your_turn(driver: webdriver) -> bool:
+def is_user_turn(driver: webdriver) -> bool:
     """Returns the name of the current player
 
     Args:
@@ -224,7 +224,7 @@ def main():
                 print(
                     "All words have been cleared from the current dictionary."
                 )
-            is_your_turn = is_your_turn(program_driver)
+            is_your_turn = is_user_turn(program_driver)
             while is_your_turn:
                 if RARITY % 37 == 0:
                     word_input = get_word_with_rare(
