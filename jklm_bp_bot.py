@@ -126,7 +126,7 @@ def is_your_turn(driver: webdriver) -> bool:
     Returns:
         bool: true if it is the users turn, false otherwise
     """
-    return get_player_turn(driver)
+    return get_player_turn(driver) == ""
 
 
 def get_word(syllable: str, words: list) -> str:
@@ -192,8 +192,8 @@ def input_word(driver: webdriver, word: str) -> None:
         elem.clear()
         elem.send_keys(word)
         elem.send_keys(Keys.RETURN)
-    except ElementNotInteractableException:
-        pass
+    # except ElementNotInteractableException:
+    #     pass
     except InvalidElementStateException:
         pass
 
