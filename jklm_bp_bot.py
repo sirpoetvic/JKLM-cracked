@@ -1,6 +1,7 @@
 """Module generates and runs a "bot" that responds to JKLM's Bomb Party.
--- Escape key quits game
--- Space bar resets word_list
+-- Enter a username and a room code ID into the CLI to start
+-- Escape key resets word bank
+-- Ctrl+C to reset game (in CLI)
 """
 
 import time
