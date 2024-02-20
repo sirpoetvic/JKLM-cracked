@@ -48,10 +48,12 @@ def set_username(driver: webdriver, username: str, time_to_load: int = 30):
     Args:
         driver (WebDriver): Driver of the accessed websites
         username (string): custom username
-        time_to_load (int, optional): _description_. Defaults to 30.
+        time_to_load (int, optional): Max time before timeout in seconds
     """
     wait = WebDriverWait(driver, time_to_load)
-    elem = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".nickname")))
+    elem = wait.until(
+        EC.element_to_be_clickable((By.CSS_SELECTOR, ".nickname"))
+    )
     elem.clear()
     elem.send_keys(username)
     elem.send_keys(Keys.RETURN)
@@ -62,7 +64,7 @@ def switch_to_iframe(driver: webdriver, time_to_load: int = 30):
 
     Args:
         driver (WebDriver): Driver of the accessed websites
-        time_to_load (int, optional): _description_. Defaults to 30.
+        time_to_load (int): Max time before timeout in seconds
     """
 
     # Find the iframe using its tag name
@@ -78,7 +80,7 @@ def join_game(driver: webdriver, time_to_load: int = 30):
 
     Args:
         driver (WebDriver): Driver of the accessed websites
-        time_to_load (int): _description_
+        time_to_load (int): Max time before timeout in seconds
     """
     wait = WebDriverWait(driver, time_to_load)
     element = wait.until(
@@ -128,7 +130,7 @@ def get_word(syllable: str, words: list) -> str:
         if (
             syllable in word
             and len(word) > len(longest)
-            and word not in used_words.keys()
+            and word not in used_words
         ):
             longest = word
             used_words[word] = 1
@@ -186,7 +188,9 @@ PROGRAM_IS_ACTIVE, GAME_IS_ACTIVE, is_your_turn = True, False, False
 username = input("Enter a username: ")
 with open("dict.txt") as f:
     word_dict = [line[:-1] for line in f]
-program_driver = setup_selenium(f"https://jklm.fun/{(input('room code id: '))}")
+program_driver = setup_selenium(
+    f"https://jklm.fun/{(input('room code id: '))}"
+)
 set_username(program_driver, username)
 switch_to_iframe(program_driver)  # jklm uses an iframe to host its gameplay
 join_game(program_driver, 30)  # join the game
@@ -211,7 +215,9 @@ while PROGRAM_IS_ACTIVE:
                 RARE += 1
                 RARE %= len(rare_letters)
             else:
-                word_input = get_word(scan_for_syllable(program_driver), word_dict)
+                word_input = get_word(
+                    scan_for_syllable(program_driver), word_dict
+                )
             input_word(program_driver, word_input)
             time.sleep(0.05)
             is_your_turn = False
