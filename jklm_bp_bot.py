@@ -15,11 +15,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import ElementNotInteractableException
 from selenium.common.exceptions import InvalidElementStateException
 
-used_words = dict()
+used_words = set()
 rare_letters = ["q", "k", "j", "x", "w", "z"]
 
 
-def setup_selenium(link: str):
+def setup_selenium(link: str) -> webdriver:
     """Sets up Selenium driver
 
     Args:
@@ -42,27 +42,31 @@ def setup_selenium(link: str):
     return driver
 
 
-def set_username(driver: webdriver, username: str, time_to_load: int = 30):
+def set_username(
+    driver: webdriver, username: str, time_to_load: int = 30
+) -> None:
     """Sets the username of the user
 
     Args:
         driver (WebDriver): Driver of the accessed websites
         username (string): custom username
-        time_to_load (int, optional): _description_. Defaults to 30.
+        time_to_load (int): Max time before timeout in seconds
     """
     wait = WebDriverWait(driver, time_to_load)
-    elem = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".nickname")))
+    elem = wait.until(
+        EC.element_to_be_clickable((By.CSS_SELECTOR, ".nickname"))
+    )
     elem.clear()
     elem.send_keys(username)
     elem.send_keys(Keys.RETURN)
 
 
-def switch_to_iframe(driver: webdriver, time_to_load: int = 30):
+def switch_to_iframe(driver: webdriver, time_to_load: int = 30) -> None:
     """Switches to the IFrame of a given driver
 
     Args:
         driver (WebDriver): Driver of the accessed websites
-        time_to_load (int, optional): _description_. Defaults to 30.
+        time_to_load (int): Max time before timeout in seconds
     """
 
     # Find the iframe using its tag name
@@ -73,12 +77,12 @@ def switch_to_iframe(driver: webdriver, time_to_load: int = 30):
     driver.switch_to.frame(iframe)
 
 
-def join_game(driver: webdriver, time_to_load: int = 30):
+def join_game(driver: webdriver, time_to_load: int = 30) -> None:
     """Joins the game
 
     Args:
         driver (WebDriver): Driver of the accessed websites
-        time_to_load (int): _description_
+        time_to_load (int): Max time before timeout in seconds
     """
     wait = WebDriverWait(driver, time_to_load)
     element = wait.until(
@@ -100,7 +104,7 @@ def scan_for_syllable(driver: webdriver) -> str:
     return element.text.upper()
 
 
-def get_player_turn(driver: webdriver):
+def get_player_turn(driver: webdriver) -> str:
     """Returns the name of the current player
 
     Args:
@@ -111,6 +115,18 @@ def get_player_turn(driver: webdriver):
     """
     element = driver.find_element(By.CSS_SELECTOR, ".player")
     return element.text
+
+
+def is_user_turn(driver: webdriver) -> bool:
+    """Returns the name of the current player
+
+    Args:
+        driver (WebDriver): Driver of the accessed websites
+
+    Returns:
+        bool: true if it is the users turn, false otherwise
+    """
+    return get_player_turn(driver) == ""
 
 
 def get_word(syllable: str, words: list) -> str:
@@ -128,10 +144,10 @@ def get_word(syllable: str, words: list) -> str:
         if (
             syllable in word
             and len(word) > len(longest)
-            and word not in used_words.keys()
+            and word not in used_words
         ):
             longest = word
-            used_words[word] = 1
+            used_words.add(word)
 
     return longest
 
@@ -153,16 +169,16 @@ def get_word_with_rare(syllable: str, words: list, num: int) -> str:
         if (
             syllable in word
             and len(word) > len(longest)
-            and word not in used_words.keys()
+            and word not in used_words
             and rare_letters[num]
         ):
             longest = word
-            used_words[word] = 1
+            used_words.add(word)
 
     return longest
 
 
-def input_word(driver: webdriver, word: str):
+def input_word(driver: webdriver, word: str) -> None:
     """Inputs given word into input box
 
     Args:
@@ -176,45 +192,57 @@ def input_word(driver: webdriver, word: str):
         elem.clear()
         elem.send_keys(word)
         elem.send_keys(Keys.RETURN)
-    except ElementNotInteractableException:
-        pass
+    # except ElementNotInteractableException:
+    #     pass
     except InvalidElementStateException:
         pass
 
 
-PROGRAM_IS_ACTIVE, GAME_IS_ACTIVE, is_your_turn = True, False, False
-username = input("Enter a username: ")
-with open("dict.txt") as f:
-    word_dict = [line[:-1] for line in f]
-program_driver = setup_selenium(f"https://jklm.fun/{(input('room code id: '))}")
-set_username(program_driver, username)
-switch_to_iframe(program_driver)  # jklm uses an iframe to host its gameplay
-join_game(program_driver, 30)  # join the game
+def main():
+    PROGRAM_IS_ACTIVE, GAME_IS_ACTIVE, is_your_turn = True, False, False
+    username = input("Enter a username: ")
+    with open("dict.txt") as f:
+        word_dict = [line[:-1] for line in f]
+    program_driver = setup_selenium(
+        f"https://jklm.fun/{(input('room code id: '))}"
+    )
+    set_username(program_driver, username)
+    switch_to_iframe(
+        program_driver
+    )  # jklm uses an iframe to host its gameplay
+    join_game(program_driver, 30)  # join the game
 
+    GAME_IS_ACTIVE = True
 
-GAME_IS_ACTIVE = True
+    RARE = 0
+    RARITY = 0
 
-RARE = 0
-RARITY = 0
-
-while PROGRAM_IS_ACTIVE:
-    while GAME_IS_ACTIVE:
-        if keyboard.is_pressed("esc"):
-            word_dict.clear()
-            print("All words have been cleared from the current dictionary.")
-        is_your_turn = get_player_turn(program_driver) == ""
-        while is_your_turn:
-            if RARITY % 37 == 0:
-                word_input = get_word_with_rare(
-                    scan_for_syllable(program_driver), word_dict, RARE
+    while PROGRAM_IS_ACTIVE:
+        while GAME_IS_ACTIVE:
+            if keyboard.is_pressed("esc"):
+                used_words.clear()
+                print(
+                    "All words have been cleared from the current dictionary."
                 )
-                RARE += 1
-                RARE %= len(rare_letters)
-            else:
-                word_input = get_word(scan_for_syllable(program_driver), word_dict)
-            input_word(program_driver, word_input)
-            time.sleep(0.05)
-            is_your_turn = False
-            RARITY = RARITY + 1
-program_driver.quit()
-sys.exit()
+            is_your_turn = is_user_turn(program_driver)
+            while is_your_turn:
+                if RARITY % 37 == 0:
+                    word_input = get_word_with_rare(
+                        scan_for_syllable(program_driver), word_dict, RARE
+                    )
+                    RARE += 1
+                    RARE %= len(rare_letters)
+                else:
+                    word_input = get_word(
+                        scan_for_syllable(program_driver), word_dict
+                    )
+                input_word(program_driver, word_input)
+                time.sleep(0.05)
+                is_your_turn = False
+                RARITY = RARITY + 1
+    program_driver.quit()
+    sys.exit()
+
+
+if __name__ == "__main__":
+    main()
