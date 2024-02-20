@@ -169,7 +169,7 @@ def get_word_with_rare(syllable: str, words: list, num: int) -> str:
         if (
             syllable in word
             and len(word) > len(longest)
-            and word not in used_words.keys()
+            and word not in used_words
             and rare_letters[num]
         ):
             longest = word
