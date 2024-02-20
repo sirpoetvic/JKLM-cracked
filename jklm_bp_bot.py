@@ -199,8 +199,6 @@ RARITY = 0
 while PROGRAM_IS_ACTIVE:
     while GAME_IS_ACTIVE:
         if keyboard.is_pressed("esc"):
-            GAME_IS_ACTIVE = False
-        if keyboard.is_pressed("space"):
             word_dict.clear()
             print("All words have been cleared from the current dictionary.")
         is_your_turn = get_player_turn(program_driver) == ""
