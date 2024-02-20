@@ -19,7 +19,7 @@ used_words = dict()
 rare_letters = ["q", "k", "j", "x", "w", "z"]
 
 
-def setup_selenium(link: str):
+def setup_selenium(link: str) -> webdriver:
     """Sets up Selenium driver
 
     Args:
