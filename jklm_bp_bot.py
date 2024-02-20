@@ -50,7 +50,7 @@ def set_username(
     Args:
         driver (WebDriver): Driver of the accessed websites
         username (string): custom username
-        time_to_load (int, optional): Max time before timeout in seconds
+        time_to_load (int): Max time before timeout in seconds
     """
     wait = WebDriverWait(driver, time_to_load)
     elem = wait.until(
@@ -115,6 +115,18 @@ def get_player_turn(driver: webdriver) -> str:
     """
     element = driver.find_element(By.CSS_SELECTOR, ".player")
     return element.text
+
+
+def is_your_turn(driver: webdriver) -> bool:
+    """Returns the name of the current player
+
+    Args:
+        driver (WebDriver): Driver of the accessed websites
+
+    Returns:
+        bool: true if it is the users turn, false otherwise
+    """
+    return get_player_turn(driver)
 
 
 def get_word(syllable: str, words: list) -> str:
@@ -212,7 +224,7 @@ def main():
                 print(
                     "All words have been cleared from the current dictionary."
                 )
-            is_your_turn = get_player_turn(program_driver) == ""
+            is_your_turn = is_your_turn(program_driver)
             while is_your_turn:
                 if RARITY % 37 == 0:
                     word_input = get_word_with_rare(
