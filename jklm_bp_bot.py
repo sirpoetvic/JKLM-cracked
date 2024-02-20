@@ -15,7 +15,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import ElementNotInteractableException
 from selenium.common.exceptions import InvalidElementStateException
 
-used_words = dict()
+used_words = set()
 rare_letters = ["q", "k", "j", "x", "w", "z"]
 
 
@@ -147,7 +147,7 @@ def get_word(syllable: str, words: list) -> str:
             and word not in used_words
         ):
             longest = word
-            used_words[word] = 1
+            used_words.add(word)
 
     return longest
 
@@ -220,7 +220,7 @@ def main():
     while PROGRAM_IS_ACTIVE:
         while GAME_IS_ACTIVE:
             if keyboard.is_pressed("esc"):
-                word_dict.clear()
+                used_words.clear()
                 print(
                     "All words have been cleared from the current dictionary."
                 )
