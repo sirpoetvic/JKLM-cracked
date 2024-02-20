@@ -173,7 +173,7 @@ def get_word_with_rare(syllable: str, words: list, num: int) -> str:
             and rare_letters[num]
         ):
             longest = word
-            used_words[word] = 1
+            used_words.add(word)
 
     return longest
 
