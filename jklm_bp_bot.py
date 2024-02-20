@@ -186,43 +186,51 @@ def input_word(driver: webdriver, word: str) -> None:
         pass
 
 
-PROGRAM_IS_ACTIVE, GAME_IS_ACTIVE, is_your_turn = True, False, False
-username = input("Enter a username: ")
-with open("dict.txt") as f:
-    word_dict = [line[:-1] for line in f]
-program_driver = setup_selenium(
-    f"https://jklm.fun/{(input('room code id: '))}"
-)
-set_username(program_driver, username)
-switch_to_iframe(program_driver)  # jklm uses an iframe to host its gameplay
-join_game(program_driver, 30)  # join the game
+def main():
+    PROGRAM_IS_ACTIVE, GAME_IS_ACTIVE, is_your_turn = True, False, False
+    username = input("Enter a username: ")
+    with open("dict.txt") as f:
+        word_dict = [line[:-1] for line in f]
+    program_driver = setup_selenium(
+        f"https://jklm.fun/{(input('room code id: '))}"
+    )
+    set_username(program_driver, username)
+    switch_to_iframe(
+        program_driver
+    )  # jklm uses an iframe to host its gameplay
+    join_game(program_driver, 30)  # join the game
 
+    GAME_IS_ACTIVE = True
 
-GAME_IS_ACTIVE = True
+    RARE = 0
+    RARITY = 0
 
-RARE = 0
-RARITY = 0
-
-while PROGRAM_IS_ACTIVE:
-    while GAME_IS_ACTIVE:
-        if keyboard.is_pressed("esc"):
-            word_dict.clear()
-            print("All words have been cleared from the current dictionary.")
-        is_your_turn = get_player_turn(program_driver) == ""
-        while is_your_turn:
-            if RARITY % 37 == 0:
-                word_input = get_word_with_rare(
-                    scan_for_syllable(program_driver), word_dict, RARE
+    while PROGRAM_IS_ACTIVE:
+        while GAME_IS_ACTIVE:
+            if keyboard.is_pressed("esc"):
+                word_dict.clear()
+                print(
+                    "All words have been cleared from the current dictionary."
                 )
-                RARE += 1
-                RARE %= len(rare_letters)
-            else:
-                word_input = get_word(
-                    scan_for_syllable(program_driver), word_dict
-                )
-            input_word(program_driver, word_input)
-            time.sleep(0.05)
-            is_your_turn = False
-            RARITY = RARITY + 1
-program_driver.quit()
-sys.exit()
+            is_your_turn = get_player_turn(program_driver) == ""
+            while is_your_turn:
+                if RARITY % 37 == 0:
+                    word_input = get_word_with_rare(
+                        scan_for_syllable(program_driver), word_dict, RARE
+                    )
+                    RARE += 1
+                    RARE %= len(rare_letters)
+                else:
+                    word_input = get_word(
+                        scan_for_syllable(program_driver), word_dict
+                    )
+                input_word(program_driver, word_input)
+                time.sleep(0.05)
+                is_your_turn = False
+                RARITY = RARITY + 1
+    program_driver.quit()
+    sys.exit()
+
+
+if __name__ == "__main__":
+    main()
