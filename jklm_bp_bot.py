@@ -42,7 +42,9 @@ def setup_selenium(link: str):
     return driver
 
 
-def set_username(driver: webdriver, username: str, time_to_load: int = 30):
+def set_username(
+    driver: webdriver, username: str, time_to_load: int = 30
+) -> None:
     """Sets the username of the user
 
     Args:
@@ -59,7 +61,7 @@ def set_username(driver: webdriver, username: str, time_to_load: int = 30):
     elem.send_keys(Keys.RETURN)
 
 
-def switch_to_iframe(driver: webdriver, time_to_load: int = 30):
+def switch_to_iframe(driver: webdriver, time_to_load: int = 30) -> None:
     """Switches to the IFrame of a given driver
 
     Args:
@@ -75,7 +77,7 @@ def switch_to_iframe(driver: webdriver, time_to_load: int = 30):
     driver.switch_to.frame(iframe)
 
 
-def join_game(driver: webdriver, time_to_load: int = 30):
+def join_game(driver: webdriver, time_to_load: int = 30) -> None:
     """Joins the game
 
     Args:
@@ -102,7 +104,7 @@ def scan_for_syllable(driver: webdriver) -> str:
     return element.text.upper()
 
 
-def get_player_turn(driver: webdriver):
+def get_player_turn(driver: webdriver) -> str:
     """Returns the name of the current player
 
     Args:
@@ -164,7 +166,7 @@ def get_word_with_rare(syllable: str, words: list, num: int) -> str:
     return longest
 
 
-def input_word(driver: webdriver, word: str):
+def input_word(driver: webdriver, word: str) -> None:
     """Inputs given word into input box
 
     Args:
